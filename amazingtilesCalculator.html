@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tile Calculator</title>
+<style>
+    body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f6;
+        margin: 0;
+        padding: 40px;
+        color: #333;
+    }
+
+    header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    header img {
+        width: 150px; /* Adjust the size of the logo */
+    }
+
+    h1 {
+        color: #383838;
+        margin-top: 20px;
+    }
+
+    section {
+        background-color: white;
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #007BFF;
+        margin-bottom: 20px;
+    }
+
+    form div {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 10px;
+        font-weight: 500;
+        font-size: 16px;
+        color: #555;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ccc;
+        border-radius: 6px;
+    }
+
+    input:focus, select:focus {
+        border-color: #007BFF;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #007BFF;
+        border: none;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        border-radius: 6px;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    #result, #totalCoverageResult {
+        background-color: #e9ecef;
+        padding: 15px;
+        margin-top: 20px;
+        border-radius: 6px;
+        font-size: 16px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    footer {
+        text-align: center;
+        margin-top: 40px;
+        font-size: 16px;
+        color: #aaa;
+    }
+</style>
+</head>
+<body>
+    <header>
+        <img src="https://www.amazingtiles.com.au/cdn/shop/files/final-logo-amazing.png?v=1651806364" alt="Amazing Tiles Logo">
+        <h1>Tile Calculator</h1>
+    </header>
+
+    <!-- Tile and Box Calculator -->
+    <section>
+        <h2>Calculate Tiles and Boxes Needed</h2>
+        <form id="tileCalculator">
+            <div>
+                <label for="tileLength">Tile Length (mm):</label>
+                <input type="number" id="tileLength" required>
+            </div>
+            <div>
+                <label for="tileWidth">Tile Width (mm):</label>
+                <input type="number" id="tileWidth" required>
+            </div>
+            <div>
+                <label>Space Dimensions:</label>
+                <select id="dimensionType" onchange="toggleDimensions()">
+                    <option value="totalArea">Total Square Meters</option>
+                    <option value="lengthWidth">Length and Width</option>
+                </select>
+            </div>
+            <div id="totalAreaInput">
+                <label for="totalArea">Total Area (square meters):</label>
+                <input type="number" id="totalArea" required>
+            </div>
+            <div id="lengthWidthInput" style="display:none">
+                <label for="spaceLength">Space Length (meters):</label>
+                <input type="number" id="spaceLength">
+                <label for="spaceWidth">Space Width (meters):</label>
+                <input type="number" id="spaceWidth">
+            </div>
+            <div>
+                <label for="tilesPerBox">Tiles per Box:</label>
+                <input type="number" id="tilesPerBox" required>
+            </div>
+            <div>
+                <button type="button" onclick="calculateTiles()">Calculate</button>
+            </div>
+            <div id="result"></div>
+        </form>
+    </section>
+
+    <!-- Total Coverage Calculator -->
+    <section>
+        <h2>Calculate Total Coverage Area</h2>
+        <form id="coverageCalculator">
+            <div>
+                <label for="tileLengthCoverage">Tile Length (mm):</label>
+                <input type="number" id="tileLengthCoverage" required>
+            </div>
+            <div>
+                <label for="tileWidthCoverage">Tile Width (mm):</label>
+                <input type="number" id="tileWidthCoverage" required>
+            </div>
+            <div>
+                <label for="tilesPerBoxCoverage">Tiles per Box:</label>
+                <input type="number" id="tilesPerBoxCoverage" required>
+            </div>
+            <div>
+                <label for="totalBoxes">Total Boxes:</label>
+                <input type="number" id="totalBoxes" required>
+            </div>
+            <div>
+                <button type="button" onclick="calculateTotalCoverage()">Calculate Coverage</button>
+            </div>
+            <div id="totalCoverageResult"></div>
+        </form>
+    </section>
+
+    <footer>
+        Developed by Ahsanul Islam Dipu
+    </footer>
+
+<script>
+function toggleDimensions() {
+    var dimensionType = document.getElementById('dimensionType').value;
+    if (dimensionType === 'totalArea') {
+        document.getElementById('totalAreaInput').style.display = 'block';
+        document.getElementById('lengthWidthInput').style.display = 'none';
+        document.getElementById('spaceLength').required = false;
+        document.getElementById('spaceWidth').required = false;
+        document.getElementById('totalArea').required = true;
+    } else {
+        document.getElementById('totalAreaInput').style.display = 'none';
+        document.getElementById('lengthWidthInput').style.display = 'block';
+        document.getElementById('spaceLength').required = true;
+        document.getElementById('spaceWidth').required = true;
+        document.getElementById('totalArea').required = false;
+    }
+}
+
+function calculateTiles() {
+    const tileLength = parseFloat(document.getElementById('tileLength').value);
+    const tileWidth = parseFloat(document.getElementById('tileWidth').value);
+    const tilesPerBox = parseInt(document.getElementById('tilesPerBox').value);
+
+    let totalAreaMeters;
+    const dimensionType = document.getElementById('dimensionType').value;
+    if (dimensionType === 'totalArea') {
+        totalAreaMeters = parseFloat(document.getElementById('totalArea').value);
+    } else {
+        const spaceLength = parseFloat(document.getElementById('spaceLength').value);
+        const spaceWidth = parseFloat(document.getElementById('spaceWidth').value);
+        totalAreaMeters = spaceLength * spaceWidth;
+    }
+
+    const tileAreaMM = tileLength * tileWidth;
+    const tileAreaMeters = tileAreaMM / 1000000;
+    let tilesNeeded = totalAreaMeters / tileAreaMeters;
+    tilesNeeded = Math.ceil(tilesNeeded);
+    const boxesNeeded = Math.ceil(tilesNeeded / tilesPerBox);
+
+    const exactCoverageMeters = tilesPerBox * boxesNeeded * tileAreaMeters;
+
+    document.getElementById('result').innerHTML = `Total tiles needed: ${tilesNeeded}<br>
+    Total boxes needed: ${boxesNeeded}<br>
+    Exact area covered by required boxes: ${exactCoverageMeters.toFixed(2)} square meters`;
+}
+
+function calculateTotalCoverage() {
+    const tileLength = parseFloat(document.getElementById('tileLengthCoverage').value);
+    const tileWidth = parseFloat(document.getElementById('tileWidthCoverage').value);
+    const tilesPerBox = parseInt(document.getElementById('tilesPerBoxCoverage').value);
+    const totalBoxes = parseInt(document.getElementById('totalBoxes').value);
+
+    const tileAreaMM = tileLength * tileWidth;
+    const tileAreaMeters = tileAreaMM / 1000000;
+    const totalTiles = tilesPerBox * totalBoxes;
+    const totalCoverageMeters = totalTiles * tileAreaMeters;
+
+    document.getElementById('totalCoverageResult').innerHTML = `Total area covered by ${totalBoxes} boxes: ${totalCoverageMeters.toFixed(2)} square meters`;
+}
+</script>
+</body>
+</html>
